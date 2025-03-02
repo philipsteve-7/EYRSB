@@ -9,7 +9,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "bcryptjs": "^3.0.2",
     "cors": "^2.8.5",
@@ -18,5 +17,17 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.11.0",
     "nodemon": "^3.1.9"
-  }
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/philipsteve-7/EYRSB.git"
+  },
+  "bugs": {
+    "url": "https://github.com/philipsteve-7/EYRSB/issues"
+  },
+  "homepage": "https://github.com/philipsteve-7/EYRSB#readme",
+  "description": ""
 }

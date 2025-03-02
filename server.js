@@ -10,7 +10,7 @@ app.use(express.json());
 
 //Home page api
 app.get('/',(req, res)=>{
-    res.send("<h1 align=center>Welcome to recipie sharing platform</h1>")
+    res.send("<h1 align=center>Welcome to the MERN stack week 2 session</h1>")
 })
 
 //Registration page api
