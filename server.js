@@ -5,12 +5,12 @@ const User=require('./models/User')
 const bcrypt=require('bcryptjs')
 
 const app=express()
-const PORT=3000
+const PORT=5000
 app.use(express.json());
 
 //Home page api
 app.get('/',(req, res)=>{
-    res.send("<h1 align=center>Welcome to the MERN stack week 2 session</h1>")
+    res.send("<h1 align=center>Welcome to the MERN Stack Recipie Platform</h1>")
 })
 
 //Registration page api
