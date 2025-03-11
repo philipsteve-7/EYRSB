@@ -1,9 +1,14 @@
-const mongoose=require('mongoose')
+import mongoose from "mongoose";
 
-const UserSchema=mongoose.Schema({
-    username:{type:String,require:true},
-    email:{type:String,require:true},
-    password:{type:String,require:true}
-})
+// Define the User schema
+const UserSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  savedRecipes: [{ type: mongoose.Schema.Types.ObjectId, ref: "Recipe" }],
+});
 
-module.exports=mongoose.model('User',UserSchema)
+// Create the User model based on the schema
+const UserModel = mongoose.model("User", UserSchema); // "User" collection will be automatically pluralized to "users"
+
+// Export the model (you can use default export for simplicity)
+export default UserModel;
