@@ -6,28 +6,35 @@ import { verifyToken } from "./user.js";
 
 const router = express.Router();
 
+// Get all recipes
 router.get("/", async (req, res) => {
   try {
     const result = await RecipesModel.find({});
     res.status(200).json(result);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({ message: "Failed to retrieve recipes", error: err.message });
   }
 });
 
 // Create a new recipe
 router.post("/", verifyToken, async (req, res) => {
+  const { name, image, ingredients, instructions, imageUrl, cookingTime, userOwner } = req.body;
+  
+  // Basic validation to ensure data is provided
+  if (!name || !ingredients || !instructions) {
+    return res.status(400).json({ message: "Name, ingredients, and instructions are required" });
+  }
+
   const recipe = new RecipesModel({
     _id: new mongoose.Types.ObjectId(),
-    name: req.body.name,
-    image: req.body.image,
-    ingredients: req.body.ingredients,
-    instructions: req.body.instructions,
-    imageUrl: req.body.imageUrl,
-    cookingTime: req.body.cookingTime,
-    userOwner: req.body.userOwner,
+    name,
+    image,
+    ingredients,
+    instructions,
+    imageUrl,
+    cookingTime,
+    userOwner,
   });
-  console.log(recipe);
 
   try {
     const result = await recipe.save();
@@ -41,8 +48,7 @@ router.post("/", verifyToken, async (req, res) => {
       },
     });
   } catch (err) {
-    // console.log(err);
-    res.status(500).json(err);
+    res.status(500).json({ message: "Failed to create recipe", error: err.message });
   }
 });
 
@@ -50,49 +56,64 @@ router.post("/", verifyToken, async (req, res) => {
 router.get("/:recipeId", async (req, res) => {
   try {
     const result = await RecipesModel.findById(req.params.recipeId);
+    if (!result) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
     res.status(200).json(result);
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({ message: "Failed to retrieve recipe", error: err.message });
   }
 });
 
-// Save a Recipe
+// Save a recipe (to user's saved recipes)
 router.put("/", async (req, res) => {
-  const recipe = await RecipesModel.findById(req.body.recipeID);
-  const user = await UserModel.findById(req.body.userID);
+  const { recipeID, userID } = req.body;
+
   try {
+    const recipe = await RecipesModel.findById(recipeID);
+    const user = await UserModel.findById(userID);
+
+    if (!recipe) {
+      return res.status(404).json({ message: "Recipe not found" });
+    }
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
     user.savedRecipes.push(recipe);
     await user.save();
-    res.status(201).json({ savedRecipes: user.savedRecipes });
+    res.status(200).json({ savedRecipes: user.savedRecipes });
   } catch (err) {
-    res.status(500).json(err);
+    res.status(500).json({ message: "Failed to save recipe", error: err.message });
   }
 });
 
-// Get id of saved recipes
+// Get ids of saved recipes
 router.get("/savedRecipes/ids/:userId", async (req, res) => {
   try {
     const user = await UserModel.findById(req.params.userId);
-    res.status(201).json({ savedRecipes: user?.savedRecipes });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.status(200).json({ savedRecipes: user.savedRecipes });
   } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
+    res.status(500).json({ message: "Failed to retrieve saved recipes IDs", error: err.message });
   }
 });
 
-// Get saved recipes
+// Get saved recipes for a user
 router.get("/savedRecipes/:userId", async (req, res) => {
   try {
     const user = await UserModel.findById(req.params.userId);
-    const savedRecipes = await RecipesModel.find({
-      _id: { $in: user.savedRecipes },
-    });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
 
-    console.log(savedRecipes);
-    res.status(201).json({ savedRecipes });
+    const savedRecipes = await RecipesModel.find({ _id: { $in: user.savedRecipes } });
+    res.status(200).json({ savedRecipes });
   } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
+    res.status(500).json({ message: "Failed to retrieve saved recipes", error: err.message });
   }
 });
 
